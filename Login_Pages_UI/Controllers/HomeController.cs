@@ -102,6 +102,11 @@ namespace Login_Pages_UI.Controllers
             return View();
         }
 
+        public IActionResult ResetPassword()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();
