@@ -1,4 +1,5 @@
 using Application.Data;
+using Application.Extenisons;
 using Entities.Entity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,7 +12,19 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityContext")));
 
-builder.Services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<AppDbContext>();
+builder.Services.AddIdentityWithExt();
+
+builder.Services.ConfigureApplicationCookie(opt =>
+{
+    var cookieBuilder = new CookieBuilder();
+
+    cookieBuilder.Name = "Login_Pages_UI";
+    opt.LoginPath = new PathString("/Home/SignIn");
+
+    opt.Cookie = cookieBuilder;
+    opt.ExpireTimeSpan = TimeSpan.FromDays(30);
+    opt.SlidingExpiration = true;
+});
 
 var app = builder.Build();
 
@@ -31,7 +44,13 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
+
+app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
 
 app.Run();
